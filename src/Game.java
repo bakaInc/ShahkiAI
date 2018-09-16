@@ -1,15 +1,53 @@
 import java.awt.image.AreaAveragingScaleFilter;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.*;
 
 
 public class Game {
+
     public class Arr {
 
-        //int[] byte;
+        public int[] getData() {
+            return data;
+        }
+
+        public void setData(int[] data) {
+            this.data = data;
+        }
+
+        private int[] data;
+
+        Arr(int[] obj){
+            this.data = obj;
+        }
+
+        @Override
+        public int hashCode() {
+            Object[] src = new Object[this.data.length+1];
+            ArrayList ar = new ArrayList();
+            for(int t : this.data){ ar.add(t); }
+
+            src = ar.toArray();
+
+            return Arrays.deepHashCode(src);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null){return false;}
+            //int[] arr = new int[]{ Array.getByte(obj,0), Array.getByte(obj,1)} ;
+
+            Arr arr = (Arr)obj;
+            if(Arrays.equals(this.data, arr.getData())){ return true; }
+
+            return false;
+
+        }
+
 
     }
-    Map<int[], ShashKa> _shashka = new HashMap<>();
+    Map<Arr, ShashKa> _shashka = new HashMap<>();
 
     public class ShashKa {
 
@@ -49,16 +87,16 @@ public class Game {
 
             byte[][] nearMove = new byte[][]{{0, 0, 0, 0}, {0, 0, 0, 0}};
 
-            for (int[] position : _shashka.keySet()) {
+            for (var position : _shashka.keySet()) {
 
-                if (Arrays.equals(position, new int[]{pos[0] + 1, pos[1] - 1})) {nearS[0][1] = 1;}//c
-                if (Arrays.equals(position, new int[]{pos[0] + 1, pos[1] + 1})) {nearS[1][1] = 1;}//g
-                if (Arrays.equals(position, new int[]{pos[0] + 2, pos[1] - 2})) {nearS[0][0] = 1;}//d
-                if (Arrays.equals(position, new int[]{pos[0] + 2, pos[1] + 2})) {nearS[1][0] = 1;}//h
-                if (Arrays.equals(position, new int[]{pos[0] - 1, pos[1] - 1})) {nearS[1][2] = 1;}//f
-                if (Arrays.equals(position, new int[]{pos[0] - 1, pos[1] + 1})) {nearS[0][2] = 1;}//b
-                if (Arrays.equals(position, new int[]{pos[0] - 2, pos[1] - 2})) {nearS[1][3] = 1;}//e
-                if (Arrays.equals(position, new int[]{pos[0] - 2, pos[1] + 2})) {nearS[0][3] = 1;}//a
+                if (Arrays.equals(position.getData(), new int[]{pos[0] + 1, pos[1] - 1})) {nearS[0][1] = 1;}//c
+                if (Arrays.equals(position.getData(), new int[]{pos[0] + 1, pos[1] + 1})) {nearS[1][1] = 1;}//g
+                if (Arrays.equals(position.getData(), new int[]{pos[0] + 2, pos[1] - 2})) {nearS[0][0] = 1;}//d
+                if (Arrays.equals(position.getData(), new int[]{pos[0] + 2, pos[1] + 2})) {nearS[1][0] = 1;}//h
+                if (Arrays.equals(position.getData(), new int[]{pos[0] - 1, pos[1] - 1})) {nearS[1][2] = 1;}//f
+                if (Arrays.equals(position.getData(), new int[]{pos[0] - 1, pos[1] + 1})) {nearS[0][2] = 1;}//b
+                if (Arrays.equals(position.getData(), new int[]{pos[0] - 2, pos[1] - 2})) {nearS[1][3] = 1;}//e
+                if (Arrays.equals(position.getData(), new int[]{pos[0] - 2, pos[1] + 2})) {nearS[0][3] = 1;}//a
 
             }
             //int[]
@@ -96,12 +134,12 @@ public class Game {
                 if((i+j) % 2 == 1 ) {
                     map[i][j]=1;
                     if (i < 3) {
-                        _shashka.put(new int[]{i, j}, new ShashKa(0));//WHITE
+                        _shashka.put(new Arr(new int[]{i, j}), new ShashKa(0));//WHITE
                         map[i][j] = 2;
 
                     }
                     if (i > 4) {
-                        _shashka.put(new int[]{i, j}, new ShashKa(1));//BLACK
+                        _shashka.put(new Arr(new int[]{i, j}), new ShashKa(1));//BLACK
                         map[i][j] = 3;
                     }
 
@@ -123,36 +161,34 @@ public class Game {
         }
     }
 
+    public void start(Game game){
 
-    public static void main(String[] args) {
-        Game game = new Game();
         game.print(game.map,8,8);
 
 
-
-        for(int[] a : game._shashka.keySet()){
-            int[] test = new int[2];
-            test[0]=7;
-            test[1]=0;
-            System.out.println();
-
-            if( Arrays.equals(test, a)){
-                System.out.println(game._shashka.get(test) + " that" );
+        for(var Key : game._shashka.keySet()){
+            Arr ar = new Arr(new int[]{7,0});
+            if( ar.equals(Key)){
+                System.out.println(game._shashka.get(ar) + " that    " + Key.hashCode() + " /////////////   " + ar.hashCode() );
             }
         }
 
-        for(int[] key : game._shashka.keySet()){
+        for(var Key : game._shashka.keySet()){
             //System.out.println(key[0] + " " + key[1]);
 
-            if(Arrays.equals(new int[] {6,1}, key)) {
-               // System.out.println(game._shashka);
+            if(Arrays.equals(new int[] {6,1}, Key.getData())) {
+                // System.out.println(game._shashka);
 
-                var where = game._shashka.get(key);
+                var where = game._shashka.get(Key);
                 System.out.println(where.getClass() + " " + where.equals(null) + " " + where.color);
 
-                game.print(where.applyToMove(key), 2,4);
+                game.print(where.applyToMove(Key.getData()), 2,4);
             }
         }
+    }
+    public static void main(String[] args) {
+        Game game = new Game();
+        game.start(game);
 
     }
 
